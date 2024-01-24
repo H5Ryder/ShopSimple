@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from './Navbar';
 import Home from './Home';
@@ -6,25 +6,33 @@ import Products from './Products';
 import Cart from './Cart';
 import "./App.css";
 
-async function getShopData() {
-  let url = 'https://fakestoreapi.com/products?limit=10';
-  let response = await fetch(url);
-  let data = await response.json();
-  return data;
-}
 
-const products = await getShopData();
+
 
 
 function App() {
 
-  const [storeProducts, setStoreProducts] = useState(
-    products.map((product) => {
-      return { ...product, qty: 0 };
-    })
-  );
 
-  console.log(storeProducts);
+  const [storeProducts, setStoreProducts] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let url = 'https://fakestoreapi.com/products?limit=10';
+        let response = await fetch(url);
+        let data = await response.json();
+        setStoreProducts(
+          data.map((product) => {
+            return { ...product, qty: 0 };
+          })
+        );
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    fetchData();
+  }, []); 
 
 
   const changeQty = (id, addition) => {
